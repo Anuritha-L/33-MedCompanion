@@ -1,14 +1,11 @@
 import streamlit as st
 
-# Import your functions from app.py and rem.py here
-
-# Define the two tabs
-tabs = st.sidebar.radio("Select Tab", ["MedCompanion Chat", "Medicine Reminder"])
+tabs = st.sidebar.radio("Select Tab", ["Drug-Drug Interaction", "Medicine Reminder","AI Assistant"])
 
 # Main app content
-st.title("MedCompanion")
+st.markdown('<h1 style = "color : #0079B1;text-decoration: underline; font-size : 46px; text-align: center;font-family: Courier New"> MedCompanion</h1>', unsafe_allow_html = True)
 
-if tabs == "MedCompanion Chat":
+if tabs == "AI Assistant":
     def ques(prompt):
         from langchain import PromptTemplate
         from langchain.chains import RetrievalQA
@@ -93,9 +90,9 @@ if tabs == "MedCompanion Chat":
 
     import streamlit as st
 
-    language = st.sidebar.radio("Select Language",["english","hindi","kannada"])
+    st.markdown('<h1 style="font-size: 31px;">Your personal AI Assistant</h1>', unsafe_allow_html = True)
 
-    st.title("MedCompanion")
+    st.error('Please note that this chatbot provides general drug recommendations and should not replace professional medical advice.')
 
     if "messages" not in st.session_state:
         st.session_state.messages = []
@@ -126,7 +123,7 @@ elif tabs == "Medicine Reminder":
     import time
     from datetime import datetime, time as dt_time
 
-    st.title("Medicine Reminder App")
+    st.markdown('<h1 style="font-size: 31px;">Medicine Reminder</h1>', unsafe_allow_html = True)
 
     # Create a dictionary to store medicine details (name and time)
     medicine_data = {}
@@ -170,3 +167,37 @@ elif tabs == "Medicine Reminder":
     # Send reminders
     for name, time in medicine_data.items():
         send_notification(name, time)
+
+elif tabs == "Drug-Drug Interaction":
+    import streamlit as st
+    import pandas as pd
+
+    # Load your dataset
+    data = pd.read_csv("ddi_dataset.csv")  # Replace with the actual dataset file path
+
+    # Create a Streamlit app
+    st.markdown('<h1 style="font-size: 31px;">Drug Interaction Checker</h1>', unsafe_allow_html = True)
+
+    # Input fields for two drug names
+    drug1 = st.text_input("Enter Drug 1:")
+    drug2 = st.text_input("Enter Drug 2:")
+
+    # Button to check interaction
+    if st.button("Check Interaction"):
+        interaction = data[(data["Drug_1"] == drug1) & (data["Drug_2"] == drug2)]
+        
+        if not interaction.empty:
+            severity = interaction["Severity"].values[0]
+            description = interaction["Description"].values[0]
+            
+            st.success("Interaction Found!")
+            st.write(f"Severity: {severity}")
+            st.write(f"Description: {description}")
+            if severity=='Minor':
+                st.image('low_risk.png',width=200,caption='low risk')
+            elif severity=='Moderate':
+                st.image('moderate_risk.png',width=200,caption='moderate risk')
+            elif severity=='Major':
+                st.image('high_risk.png',width=200,caption='high risk')
+        else:
+            st.warning("No interaction found for the given drugs.")
